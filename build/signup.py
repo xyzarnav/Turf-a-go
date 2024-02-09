@@ -11,7 +11,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"G:\test5\build\assets\frame1")
+ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame1")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -67,7 +67,7 @@ entry_1 = Entry(
 )
 entry_1.place(
     x=352.0,
-    y=230.0,
+    y=232.0,
     width=181.0,
     height=31.0
 )
@@ -87,7 +87,7 @@ entry_2 = Entry(
 )
 entry_2.place(
     x=352.0,
-    y=302.0,
+    y=304.0,
     width=181.0,
     height=31.0
 )
@@ -125,7 +125,7 @@ entry_3 = Entry(
 )
 entry_3.place(
     x=352.0,
-    y=165.0,
+    y=167.0,
     width=181.0,
     height=31.0
 )
@@ -154,7 +154,7 @@ entry_4 = Entry(
 )
 entry_4.place(
     x=604.0,
-    y=165.0,
+    y=167.0,
     width=181.0,
     height=31.0
 )
