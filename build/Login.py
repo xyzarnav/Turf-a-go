@@ -8,7 +8,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame0")
-
+#destroy
 def open_signup_page():
     window.destroy()
     call(["python","build\signup.py"])
