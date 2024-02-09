@@ -2,8 +2,7 @@
 from pathlib import Path
 from subprocess import call
 
-# from tkinter import *
-# Explicit imports to satisfy Flake8
+
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
