@@ -57,7 +57,7 @@ button_1 = Button(
     bg="#000000"
 )
 button_1.place(
-    x=48.0,
+    x=38.0,
     y=239.0,
     width=163.0,
     height=35.0
@@ -74,7 +74,7 @@ button_2 = Button(
     bg="#000000"
 )
 button_2.place(
-    x=45.0,
+    x=41.0,
     y=309.0,
     width=192.0,
     height=35.0
@@ -96,7 +96,8 @@ button_3 = Button(
     borderwidth=0,
     highlightthickness=0,
     command=lambda: print("button_3 clicked"),
-    relief="flat"
+    relief="flat",
+    bg="#ffffff"
 )
 button_3.place(
     x=1224.0,
@@ -124,7 +125,7 @@ button_4 = Button(
     bg="#000000"
 )
 button_4.place(
-    x=45.0,
+    x=27.0,
     y=379.0,
     width=192.0,
     height=35.0
@@ -141,7 +142,7 @@ button_5 = Button(
     bg="#000000"
 )
 button_5.place(
-    x=45.0,
+    x=44.0,
     y=454.0,
     width=216.0,
     height=35.0
@@ -158,7 +159,7 @@ button_6 = Button(
     bg="#000000"
 )
 button_6.place(
-    x=45.0,
+    x=59.0,
     y=530.0,
     width=177.0,
     height=70.0
@@ -175,7 +176,7 @@ button_7 = Button(
     bg="#000000"
 )
 button_7.place(
-    x=48.0,
+    x=52.0,
     y=623.0,
     width=226.0,
     height=35.0
@@ -248,7 +249,7 @@ button_10 = Button(
     highlightthickness=0,
     command=lambda: print("button_10 clicked"),
     relief="flat",
-    bg="#000000"
+    bg="#ffffff"
 )
 button_10.place(
     x=984.0,
