@@ -15,6 +15,7 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame2")
 def open_grp_booking():
     window.withdraw()
     call(["python","build\groupbook.py"])
+    window.geometry("+100+400")
     window.deiconify()
 
 def relative_to_assets(path: str) -> Path:

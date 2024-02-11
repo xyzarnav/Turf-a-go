@@ -17,7 +17,7 @@ def open_signup_page():
 def open_home_page():
     window.withdraw() 
     call(["python","build\homepage.py"])
-   
+    window.geometry("+100+400")
     
 
 def relative_to_assets(path: str) -> Path:
