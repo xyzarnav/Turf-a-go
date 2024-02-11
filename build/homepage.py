@@ -15,6 +15,7 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame2")
 
 def open_grp_booking():
+    window.destroy()
     call(["python","build\groupbook.py"])
 
 def relative_to_assets(path: str) -> Path:

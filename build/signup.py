@@ -59,13 +59,14 @@ entry_bg_1 = canvas.create_image(
     246.5,
     image=entry_image_1
 )
-entry_1 = Entry(
+entry_1_email = Entry(
     bd=0,
     bg="#FFFFFF",
     fg="#000716",
-    highlightthickness=0
+    highlightthickness=0,
+    font=("Poppins SemiBold", 18 * -1)
 )
-entry_1.place(
+entry_1_email.place(
     x=352.0,
     y=232.0,
     width=181.0,

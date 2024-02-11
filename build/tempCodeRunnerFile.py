@@ -1,1 +1,1 @@
-te
+window.destroy()
