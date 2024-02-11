@@ -10,13 +10,14 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame0")
 #destroy
 def open_signup_page():
-    window.destroy()
+    window.withdraw()
     call(["python","build\signup.py"])
-    
+    window.deiconify()
     
 def open_home_page():
-    window.destroy()
+    window.withdraw() 
     call(["python","build\homepage.py"])
+   
     
 
 def relative_to_assets(path: str) -> Path:
