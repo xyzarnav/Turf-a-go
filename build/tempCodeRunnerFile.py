@@ -1,1 +1,1 @@
-window.destroy()
+window.withdraw()
