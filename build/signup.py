@@ -4,18 +4,55 @@
 
 #backend 
 from pathlib import Path
-
+from subprocess import call
+import sqlite3
 # from tkinter import *
 # Explicit imports to satisfy Flake8
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage,messagebox
 
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame1")
-
+conn=sqlite3.connect(r'build/userdb.db')
+cursor=conn.cursor()
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+def signup_user():
+    # Get the text from the entries
+    name = entry_3.get()
+    email = entry_1_email.get()
+    password = entry_2.get()
+    wallet = entry_5.get()
+    mobno = entry_4.get()
+
+    # Check if any field is empty
+    if not name or not email or not password or not wallet or not mobno:
+        messagebox.showerror("Error", "All fields must be filled")
+        return
+
+    # Check if wallet entry is an integer
+    if not wallet.isdigit():
+        messagebox.showerror("Error", "Wallet entry should be a number")
+        return
+
+    with sqlite3.connect(r"build\userdb.db") as db:
+        cursor = db.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user (
+                name TEXT NOT NULL, 
+                email TEXT NOT NULL,
+                password TEXT NOT NULL, 
+                wallet INT NOT NULL, 
+                mobno TEXT NOT NULL
+            );
+        ''')
+        cursor.execute("INSERT INTO user (name, email, password, wallet, mobno) VALUES (?, ?, ?, ?, ?)",
+                       (name, email, password, int(wallet), mobno))
+        db.commit()
+        print("User created")
+        window.destroy()  # Close the signup window
+        call(["python", "build/login.py"])  # Open the login page
 
 
 window = Tk()
