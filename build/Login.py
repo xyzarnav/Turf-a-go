@@ -1,9 +1,9 @@
-
+import sqlite3
 from pathlib import Path
 from subprocess import call
 
 
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage,messagebox
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -19,6 +19,20 @@ def open_home_page():
     call(["python","build\homepage.py"])
     window.geometry("+100+400")
     
+def validate_credentials():
+    username_or_email = entry_1.get()
+    password = entry_2.get()
+
+    with sqlite3.connect(r"build\userdb.db") as db:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM user WHERE (email = ? OR name = ?) AND password = ?", (username_or_email, username_or_email, password))
+        user = cursor.fetchone()
+
+    if user is None:
+        messagebox.showerror("Error", "Invalid username/email or password")
+        return False
+    else:
+        return True
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -173,14 +187,16 @@ image_3 = canvas.create_image(
     226.0,
     image=image_image_3
 )
-
+def on_login_button_clicked():
+    if validate_credentials():
+        open_home_page()
 button_image_4 = PhotoImage(
     file=relative_to_assets("button_4.png"))
 button_4 = Button(
     image=button_image_4,
     borderwidth=0,
     highlightthickness=0,
-    command=open_home_page,
+    command=on_login_button_clicked,
     relief="flat",
     bg="#ffffff"
 )

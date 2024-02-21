@@ -18,6 +18,13 @@ cursor=conn.cursor()
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+
+def validate_input_wallet(new_value):
+    return new_value.isdigit() or new_value == ""
+
+def validate_input_mobno(new_value):
+    return (new_value.isdigit() and len(new_value) <= 10) or new_value == ""
+
 def signup_user():
     # Get the text from the entries
     name = entry_3.get()
@@ -32,11 +39,11 @@ def signup_user():
         return
 
     # Check if wallet entry is an integer
-    if not wallet.isdigit():
-        messagebox.showerror("Error", "Wallet entry should be a number")
+    if int(wallet) < 100:
+        messagebox.showerror("Error", "Wallet entry should be at least 100")
         return
 
-    with sqlite3.connect(r"build\userdb.db") as db:
+    with sqlite3.connect("build\\userdb.db") as db:
         cursor = db.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user (
@@ -184,7 +191,8 @@ entry_bg_4 = canvas.create_image(
     181.5,
     image=entry_image_4
 )
-entry_4 = Entry(
+vcmd = window.register(validate_input_mobno)
+entry_4 = Entry(window, validate="key", validatecommand=(vcmd, '%P'),
     bd=0,
     bg="#FFFFFF",
     fg="#000716",
@@ -204,7 +212,8 @@ entry_bg_5 = canvas.create_image(
     246.5,
     image=entry_image_5
 )
-entry_5 = Entry(
+vcmd = window.register(validate_input_wallet)
+entry_5 = Entry(window, validate="key", validatecommand=(vcmd, '%P'),
     bd=0,
     bg="#FFFFFF",
     fg="#000716",
@@ -266,7 +275,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+     command=lambda: [print("button_1 clicked"), signup_user()][1],
     relief="flat",
     bg="#ffffff"
 )
