@@ -220,9 +220,9 @@ canvas.create_text(
     45.0,
     147.0,
     anchor="nw",
-    text="email",
+    text="email/username",
     fill="#000000",
-    font=("Poppins SemiBold", 10 * -1)
+    font=("Poppins SemiBold", 11 * -1)
 )
 
 canvas.create_text(
@@ -231,7 +231,7 @@ canvas.create_text(
     anchor="nw",
     text="password",
     fill="#000000",
-    font=("Poppins SemiBold", 10 * -1)
+    font=("Poppins SemiBold", 11 * -1)
 )
 window.resizable(False, False)
 window.mainloop()
