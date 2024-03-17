@@ -23,7 +23,7 @@ def validate_credentials():
     username_or_email = entry_1.get()
     password = entry_2.get()
 
-    with sqlite3.connect(r"build\userdb.db") as db:
+    with sqlite3.connect(r"build\user.db") as db:
         cursor = db.cursor()
         cursor.execute("SELECT * FROM user WHERE (email = ? OR name = ?) AND password = ?", (username_or_email, username_or_email, password))
         user = cursor.fetchone()

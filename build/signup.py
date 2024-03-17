@@ -13,7 +13,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage,messagebox
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame1")
-conn=sqlite3.connect(r'build/userdb.db')
+conn=sqlite3.connect(r'build/user.db')
 cursor=conn.cursor()
 
 def relative_to_assets(path: str) -> Path:
@@ -43,19 +43,23 @@ def signup_user():
         messagebox.showerror("Error", "Wallet entry should be at least 100")
         return
 
-    with sqlite3.connect("build\\userdb.db") as db:
+    with sqlite3.connect("build\\user.db") as db:
         cursor = db.cursor()
+        # cursor.execute('DROP TABLE user')
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user (
-                name TEXT NOT NULL, 
-                email TEXT NOT NULL,
-                password TEXT NOT NULL, 
-                wallet INT NOT NULL, 
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL,
+                wallet INT NOT NULL,
                 mobno TEXT NOT NULL
+                
             );
         ''')
         cursor.execute("INSERT INTO user (name, email, password, wallet, mobno) VALUES (?, ?, ?, ?, ?)",
                        (name, email, password, int(wallet), mobno))
+        
         db.commit()
         print("User created")
         window.destroy()  # Close the signup window
@@ -294,5 +298,6 @@ canvas.create_text(
     fill="#000000",
     font=("Poppins SemiBold", 14 * -1)
 )
+
 window.resizable(False, False)
 window.mainloop()

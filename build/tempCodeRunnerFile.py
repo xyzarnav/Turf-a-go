@@ -1,1 +1,1 @@
-emai
+root.mainloop()
