@@ -31,6 +31,29 @@ def open_image_window():
     label.image = photo  # Keep a reference to the image
     label.pack()
 
+def open_agreement_window():
+    # Create a new window
+    agreement_window = Toplevel(window)
+
+    # Create a Text widget with the agreement
+    agreement_text = Text(agreement_window, width=140, height=30)
+    agreement_text.insert("1.0", "                                      Turf Booking Agreement\n\n"
+        "This agreement ('Agreement') is entered into on [Date] between [Your Name] ('User') and [Turf Facility Name] ('Facility').\n\n"
+        "1. Booking Process:\n"
+        "User agrees to book turf sessions through the designated channels provided by the Facility, including online platforms, phone, or in-person booking.\n\n"
+        "2. Availability:\n"
+        
+        "User acknowledges that turf availability is subject to scheduling and prior bookings. User agrees to check availability prior to booking to ensure alignment with their desired date and time.\n\n"
+        "3. Payment:\n"
+        "User agrees to adhere to the payment terms provided by the Facility, including any deposits, upfront fees, or payment schedules. Payment must be made in full to secure the booking.\n\n"
+        "4. Cancellation Policy:\n"
+        "User acknowledges and understands the Facility's cancellation policy, including any deadlines for cancelling bookings without incurring penalties or fees.\n\n"
+        "5. Usage Guidelines:\n"
+        "*.The banner size should be in 200*150 pixels the image should be accepted only in png format\n\n"
+        "User agrees to abide by all rules and regulations set forth by the Facility regarding turf usage, including but not limited to, duration of booking, permissible activities, and equipment usage.\n\n"
+        "owner's contact:91+78999 87993                               email: turf-a-go@gmail.com")
+         
+    agreement_text.pack()
 
 window = Tk()
 
@@ -195,10 +218,10 @@ button_7 = Button(
     bg="#000000"
 )
 button_7.place(
-    x=312.0,
-    y=150.0,
-    width=1000.0,
-    height=213.0
+    x=352.0,
+    y=180.0,
+    width=900.0,
+    height=153.0
 )
 
 button_image_8 = PhotoImage(
@@ -212,10 +235,22 @@ button_8 = Button(
     bg="#000000"
 )
 button_8.place(
-    x=312.0,
-    y=379.0,
-    width=1000.0,
-    height=260.0
+    x=352.0,
+    y=349.0,
+    width=900.0,
+    height=240.0
 )
+button_image_9 = PhotoImage(file=relative_to_assets("contactus.png"))
+button_9 = Button(
+    image=button_image_9,
+    borderwidth=0,
+    highlightthickness=0,
+    command=open_agreement_window,
+    relief="flat",
+    bg="#ffffff"
+)
+button_9.place(x=592.0, y=630.0, width=200.0, height=65.0)
+label = Label(window, text="Want to feature your event like this ?", bg="#ffffff", fg="#000000", font=("Helvetica", 12, "italic"))
+label.place(x=312.0, y=652.0)
 window.resizable(False, False)
 window.mainloop()

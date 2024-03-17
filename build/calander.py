@@ -3,6 +3,7 @@
 # https://github.com/ParthJadhav/Tkinter-Designer
 
 
+import calendar
 from pathlib import Path
 import json
 from datetime import datetime
@@ -12,7 +13,8 @@ from datetime import date
 from tkinter import ttk
 import sqlite3
 from calendar import monthrange
-
+conn=sqlite3.connect(r'build/user.db')
+cursor=conn.cursor()
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
@@ -55,24 +57,24 @@ class CalendarApp(tk.Frame):
         super().__init__(master, **kwargs)
         # Create a connection to the database
         # Create a connection to the database
-        self.conn = sqlite3.connect('appointments.db')
+        # self.conn = sqlite3.connect('appointments.db')
 
-        # Create a cursor
-        self.c = self.conn.cursor()
+        # # Create a cursor
+        # self.c = self.conn.cursor()
 
-        # Create a table to store the appointments
+        # # Create a table to store the appointments
     
-        self.c.execute('''
-        CREATE TABLE IF NOT EXISTS appointments (
-        day INTEGER,
-        date_of_booking TEXT,
-        appointment TEXT,
-        day_of_week TEXT,
-        month INTEGER
-         )
-            ''')
+        # self.c.execute('''
+        # CREATE TABLE IF NOT EXISTS appointments (
+        # day INTEGER,
+        # date_of_booking TEXT,
+        # appointment TEXT,
+        # day_of_week TEXT,
+        # month INTEGER
+        #  )
+        #     ''')
       
-        self.conn.commit()
+        # self.conn.commit()
         
         # Commit the changes
         
@@ -122,10 +124,10 @@ class CalendarApp(tk.Frame):
         self.calendar_frame.destroy()
         self.calendar_frame = tk.Frame(self, bg='white')
         self.calendar_frame.grid()
-        self.print_month_year(self.month + direction, self.year)
-        self.make_buttons()
-        self.month_generator(self.day_month_starts(self.month + direction, self.year), self.days_in_month(self.month + direction, self.year))
         self.month += direction
+        self.print_month_year(self.month, self.year)
+        self.make_buttons()
+        self.month_generator(self.day_month_starts(self.month, self.year), self.days_in_month(self.month, self.year))
 
     def make_buttons(self):
         go_back_button = tk.Button(self.calendar_frame, text="<", command=lambda: self.switch_months(-1), height=1, width=3,bg='#064ACB', fg='white',font=("Arial", 12, "bold"))
@@ -147,6 +149,16 @@ class CalendarApp(tk.Frame):
         self.switch_months(0)
 
     def month_generator(self, start_date, number_of_days):
+        day = 1 
+        # Connect db user
+        conn=sqlite3.connect(r'build/user.db')
+        cursor=conn.cursor()
+    
+        cursor.execute("SELECT  booking_date FROM bookings")
+        booking_dates = cursor.fetchall()
+        appointment_dates = {row[0] for row in booking_dates}
+        print("Booking dates:", booking_dates)
+        print("Appointment dates:", appointment_dates)
         day_names = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
 
         for name_number in range(len(day_names)):
@@ -154,33 +166,48 @@ class CalendarApp(tk.Frame):
             day_label.grid(column=name_number, row=0, sticky='nsew', pady=(80, 0))
             self.calendar_frame.columnconfigure(name_number, weight=1,uniform="equal")  # Add this line
 
-        _, num_days = monthrange(self.year, self.month)
+        num_days = calendar.monthrange(self.year, self.month)[1]
         index = 0
         day = 1
+        # Adjust the month value
+    # Adjust the month value
+        self.month = self.month if self.month <= 12 else 1
+
+        num_days = calendar.monthrange(self.year, self.month)[1]
+    # rest of your code
+        # rest of your code
         for row in range(6):
-            for column in range(7):
-                if index >= start_date and index <= start_date + number_of_days - 1:
-                    if day <= num_days:
-                        day_of_week = datetime(self.year, self.month, day).strftime('%A')
-                        day_frame = tk.Frame(self.calendar_frame, bg='white',bd=1,relief='groove', highlightbackground="blue")
-                        day_frame.grid(row=row + 2, column=column, sticky='nsew')
+                for column in range(7):
+                    if index >= start_date and index <= start_date + num_days - 1:
+                        if day <= num_days:
+                            current_date = date(self.year, self.month, day)
+                            current_date_str = current_date.strftime('%d/%m/%Y')
+                            day_of_week = current_date.strftime('%A')
+                            day_frame = tk.Frame(self.calendar_frame, bg='white', bd=1, relief='groove', highlightbackground="blue")
+                            day_frame.grid(row=row + 2, column=column, sticky='nsew')
 
-                        text_box = tk.Text(day_frame, width=3, height=0.1, font=("Verdana", 12, "bold"), bg='white', fg='red')
-                        text_box.grid(row=1)
+                            text_box = tk.Text(day_frame, width=3, height=0.1, font=("Verdana", 12, "bold"), bg='white', fg='red')
+                            text_box.grid(row=1)
 
-                        self.text_object_dict[day] = text_box
-                        self.text_box = tk.Text(day_frame, width=3, height=0.2, font=("Verdana", 12, "bold"), bg='white', fg='red')
-                        self.text_box.grid(row=1)
+                            if current_date_str in appointment_dates:
+                                # Insert '@@@@' into the Text widget
+                                text_box.insert(tk.END, "@@@@")
+                                
+                            else:
+                                # Insert the day number into the Text widget
+                                text_box.insert(tk.END, " ")
 
-                        day_frame.columnconfigure(0, weight=1)
-                        day_number_label = tk.Label(day_frame, text=day,font=("Verdana", 10, "bold"), bg='white', fg='#064ACB')
-                        day_number_label.grid(row=0, sticky='nw')
+                            self.text_object_dict[day] = text_box
 
-                        book_button = tk.Button(day_frame, text="Book", command=lambda day=day, month=self.month, day_of_week=day_of_week: self.book_appointment(day, month, day_of_week))
-                        book_button.grid(row=2)
+                            day_frame.columnconfigure(0, weight=1)
+                            day_number_label = tk.Label(day_frame, text=day, font=("Verdana", 10, "bold"), bg='white', fg='#064ACB')
+                            day_number_label.grid(row=0, sticky='nw')
 
-                        day += 1
-                index += 1
+                            book_button = tk.Button(day_frame, text="Book", command=lambda day=day, month=self.month, day_of_week=day_of_week: self.book_appointment(day, month, day_of_week))
+                            book_button.grid(row=2)
+
+                            day += 1
+                    index += 1
 
         load_from_button = tk.Button(self.calendar_frame, text="Load month from...", command=self.load_from_json, bg='white', fg='white')
         save_to_button = tk.Button(self.calendar_frame, text="Save month to...", command=self.save_to_json, bg='white', fg='white')
@@ -417,5 +444,6 @@ calendar_app = CalendarApp(window)
 calendar_app.place(x=340, y=150, width=540, height=560)
 
 # Start the main event loop
+
 window.resizable(False, False)
 window.mainloop()

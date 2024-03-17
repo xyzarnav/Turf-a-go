@@ -118,14 +118,15 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS bookings (
                     booking_date DATE,
                     payable_amount REAL,
                     turf_id INTEGER,
-                    booking_amount INT
+                    booking_amount INT,
+                    turf_name TEXT
                 )''')
-def book_slot(time_slot, booking_date, payable_amount, booking_amount):
+def book_slot(time_slot, booking_date, payable_amount, booking_amount, turf_name):
     # Generate a random turf ID
     turf_id = random.randint(10009, 99999)
     # Insert the booking details into the table
-    cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount) 
-                      VALUES (?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount))
+    cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name) 
+                      VALUES (?, ?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name))
     conn.commit()
     print("Booking successful. Turf ID:", turf_id)
     
