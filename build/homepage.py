@@ -122,7 +122,8 @@ def open_time_slots_window(time_entry,payable_entry):
 
 if __name__ == "__main__":
     pass
-
+# cursor.execute("DELETE FROM bookings")
+# conn.commit()
 
 # Create a table to store bookings
 cursor.execute('''CREATE TABLE IF NOT EXISTS bookings (
@@ -134,14 +135,14 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS bookings (
                     booking_amount INT,
                     turf_name TEXT
                 )''')
-def book_slot(time_slot, booking_date, payable_amount, booking_amount, turf_name):
-    # Generate a random turf ID
-    turf_id = random.randint(10009, 99999)
-    # Insert the booking details into the table
-    cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name) 
-                      VALUES (?, ?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name))
-    conn.commit()
-    print("Booking successful. Turf ID:", turf_id)
+# def book_slot(time_slot, booking_date, payable_amount, booking_amount, turf_name):
+#     # Generate a random turf ID
+#     turf_id = random.randint(10009, 99999)
+#     # Insert the booking details into the table
+#     cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name) 
+#                       VALUES (?, ?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name))
+#     conn.commit()
+#     print("Booking successful. Turf ID:", turf_id)
     
 root = Tk()   
 group_booking_var = StringVar()
@@ -184,7 +185,7 @@ def get_wallet_balance(user_id):
             print("No user found with given ID")
             return None
 
-#ad
+#ad#@@
 def store_values():
     
     if time_entry:
@@ -211,6 +212,17 @@ def store_values():
             booking_amount = float(entry_4.get())  
         except ValueError:
             messagebox.showerror("Error", "Payable amount and booking amount must be numbers.")
+            return
+        try:
+            payable_amount = float(payable_entry.get())  
+            booking_amount = float(entry_4.get())  
+        except ValueError:
+            messagebox.showerror("Error", "Payable amount and booking amount must be numbers.")
+            return
+
+    # Check if payable_amount is greater than or equal to wallet_balance
+        if booking_amount > wallet_balance:
+            messagebox.showerror("Error", "Insufficient funds in wallet.")
             return
 
         if not time_slot:
@@ -244,7 +256,7 @@ def store_values():
 
         # Generate a random turf ID
         turf_id = "TF" + str(random.randint(9999, 99990))
-        # Insert the booking details into the table
+        # Insert the booking details into the tabled
         cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name) 
                   VALUES (?, ?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name))
         conn.commit()
@@ -252,24 +264,26 @@ def store_values():
         print("Booking succe\
             ssful. Turf ID:", turf_id)
         messagebox.showinfo("Success", "Booking successful. Turf ID: " + str(turf_id))
+        cursor.execute("UPDATE current_user SET wallet = wallet - ? WHERE id = ?", (booking_amount, current_user_id))
+        conn.commit()
 
         # Destroy the window after successful booking
-        window.destroy()
+        window.deiconify()
 
         print(f"Time slot: {time_slot}, Booking date: {booking_date}, Payable amount: {payable_amount}, Booking amount: {booking_amount}, Group booking: {group_booking}")  # New print statement
 
         
 
-        # Generate a random turf ID
-        turf_id = "TF" + str(random.randint(9999, 99990))
-        # Insert the booking details into the table
-        cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount) 
-                          VALUES (?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount))
-        conn.commit()
-        print("Booking successful. Turf ID:", turf_id)
-        messagebox.showinfo("Success", "Booking successful. Turf ID: " + str(turf_id))
-    else:
-        print("Time entry widget is not available.")
+    #     # Generate a random turf ID
+    #     turf_id = "TF" + str(random.randint(9999, 99990))
+    #     # Insert the booking details into the table
+    #     cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount) 
+    #                       VALUES (?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount))
+    #     conn.commit()
+    #     print("Booking successful. Turf ID:", turf_id)
+    #     messagebox.showinfo("Success", "Booking successful. Turf ID: " + str(turf_id))
+    # else:
+    #     print("Time entry widget is not available.")
         
 root.mainloop()
     

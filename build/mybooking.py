@@ -40,7 +40,7 @@ class TurfBookingTable:
         cursor.execute('''SELECT bookings.turf_id, bookings.booking_date, bookings.time_slot, bookings.payable_amount, bookings.booking_amount, 
                           bookings.payable_amount - bookings.booking_amount AS amount_due
                           FROM bookings 
-                          JOIN current_user ON bookings.turf_name = current_user.name 
+                          JOIN (SELECT * FROM current_user ORDER BY id DESC LIMIT 1) AS latest_user ON bookings.turf_name = latest_user.name 
                           ORDER BY bookings.turf_id DESC''')
         rows = cursor.fetchall()
         return rows

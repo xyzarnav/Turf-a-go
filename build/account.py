@@ -1,7 +1,7 @@
 
 
 
-
+import tkinter as tk 
 from pathlib import Path
 import sqlite3
 # from tkinter import *
@@ -58,7 +58,7 @@ except TypeError:
     #_______________________________________________________________________!_______________!______!_!_!_!____
 try:
     # Fetch the latest name from the user table
-    cursor.execute("SELECT name FROM user ORDER BY id DESC LIMIT 1")
+    cursor.execute("SELECT name FROM current_user ORDER BY id DESC LIMIT 1")
     latest_user_name = cursor.fetchone()[0]
 except TypeError:
     latest_user_name = "User not found"
@@ -73,7 +73,7 @@ except TypeError:
 
 try:
     # Fetch the latest wallet balance from the user table
-    cursor.execute("SELECT wallet FROM user ORDER BY id DESC LIMIT 1")
+    cursor.execute("SELECT wallet FROM current_user ORDER BY id DESC LIMIT 1")
     latest_user_wallet_balance = cursor.fetchone()[0]
 except TypeError:
     latest_user_wallet_balance = "Wallet balance not found"
@@ -301,37 +301,13 @@ canvas.create_text(
     anchor="nw",
     text="Wallet Balance",
     fill="#000000",
-    font=("Poppins SemiBold", 17 * -1)
+    font=("Poppins SemiBold", 19 * -1)
 )
 
-entry_image_3 = PhotoImage(
-    file=relative_to_assets("entry_3.png"))
-entry_bg_3 = canvas.create_image(
-    728.5,
-    397.0,
-    image=entry_image_3
-)
-entry_3 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_3.place(
-    x=624.0507621765137,
-    y=369.0,
-    width=208.89847564697266,
-    height=56.0
-)
 
-canvas.create_text(
-    610.0,
-    338.0,
-    anchor="nw",
-    text="Total Spending ",
-    fill="#000000",
-    font=("Poppins SemiBold", 17 * -1)
-)
+
+
+
 
 entry_image_4 = PhotoImage(
     file=relative_to_assets("entry_4.png"))
@@ -340,19 +316,71 @@ entry_bg_4 = canvas.create_image(
     507.9796962738037,
     image=entry_image_4
 )
+entry_4_var = tk.StringVar()
+def validate_entry_4(*args):
+    value = entry_4_var.get()
+    if not value.isdigit():  # If the value is not a digit
+        entry_4_var.set('')  # Clear the value
+
+# Set the trace
+entry_4_var.trace('w', validate_entry_4)
+def validate_input(new_value):
+    # If the new value is empty or can be converted to an integer, allow the change
+    return new_value == "" or new_value.isdigit()
+validate_cmd = window.register(validate_input)
 entry_4 = Entry(
     bd=0,
     bg="#FFFFFF",
     fg="#000716",
-    highlightthickness=0
+    highlightthickness=0,
+    textvariable=entry_4_var,  # Associate entry_4 with entry_4_var
+    validate="key",
+    validatecommand=(validate_cmd, '%P')
 )
+
+def validate_input(new_value):
+    # If the new value is empty or can be converted to an integer, allow the change
+    return new_value == "" or new_value.isdigit()
+
+validate_cmd = window.register(validate_input)
 entry_4.place(
     x=339.0507621765137,
     y=480.0,
     width=317.89847564697266,
     height=55.95939254760742
 )
+import tkinter as tk
 
+def add_money():
+    if entry_4_var.get() == '':  # If entry_4_var is an empty string
+        return  # Skip the rest of the function
+    amount = int(entry_4_var.get())  # Get the amount from entry_4
+    print(f"Adding money: {amount}")  # Debug print statement
+
+    # Fetch the current wallet balance
+    cursor.execute("SELECT wallet FROM current_user ORDER BY id DESC LIMIT 1")
+    current_wallet_balance = cursor.fetchone()[0]
+    print(f"Current wallet balance: {current_wallet_balance}")  # Debug print statement
+
+    # Fetch the id of the most recent row
+    cursor.execute("SELECT id FROM current_user ORDER BY id DESC LIMIT 1")
+    latest_id = cursor.fetchone()[0]
+
+    # Update the wallet balance in the current_user table
+    cursor.execute("UPDATE current_user SET wallet = wallet + ? WHERE id = ?", (amount, latest_id))
+    conn.commit()
+
+    # Fetch the updated wallet balance
+    cursor.execute("SELECT wallet FROM current_user WHERE id = ?", (latest_id,))
+    updated_wallet_balance = cursor.fetchone()[0]
+    print(f"Updated wallet balance: {updated_wallet_balance}")  # Debug print statement
+
+    # Update the wallet balance display in entry_2
+    entry_2.delete(0, tk.END)
+    entry_2.insert(0, updated_wallet_balance)
+      # Debug print statement
+    
+    
 canvas.create_text(
     342.5634460449219,
     454.0,
@@ -397,7 +425,7 @@ button_7 = Button(
     image=button_image_7,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_7 clicked"),
+    command=add_money,
     relief="flat"
 )
 button_7.place(
