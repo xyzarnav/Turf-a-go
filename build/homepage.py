@@ -1,4 +1,4 @@
-#gitrepo
+
 from pathlib import Path
 from subprocess import call
 from tkcalendar import DateEntry
@@ -15,7 +15,7 @@ def update_var_list(var_list, var, slot):
         var_list.append((var, slot))  # Add the (var, slot) tuple to var_list
     else:
         var_list.remove((var, slot))
-        
+     
 def calculate_payable(var_list):
     selected_slots = [slot for var, slot in var_list if var.get() == "yes"]
     return len(selected_slots)*500          #*price
@@ -49,16 +49,29 @@ def create_checkboxes(time_slots, window, time_entry):
         var_list.append((var, slot))
     return var_list
 
+
+
 def open_time_slots_window(time_entry,payable_entry):
     def submit_button_command():
+       
         selected_slots_text = submit_time_slots(var_list)
         time_entry.insert(0, selected_slots_text)
         payable_amount = calculate_payable(var_list)  # pass the price per slot here
         payable_entry.delete(0, 'end')
+        group_booking_checkbox = Checkbutton(checkbutton_frame,font='purple', text="Group Booking", variable=group_booking_var)
         payable_entry.insert(0, str(payable_amount))  # convert payable_amount to string before inserting
         print(f"Number of selected checkboxes: {payable_amount}")  # print the count to the terminal
         window.destroy()
-        
+    
+
+   
+#@@@@@@@@@@@@@@@@@@@@@@@@@@#
+    def update_group_booking_var():
+        global group_booking_var
+        group_booking_var.set("no" if group_booking_var.get() == "yes" else "no")
+
+#2@@@@@@@@@@@@@@@@@@@@@@@#
+       
     window = Tk()
     window.geometry("250x500")
     entry_2 = Entry(window)
@@ -86,7 +99,7 @@ def open_time_slots_window(time_entry,payable_entry):
      # Create a checkbox for group booking
 
     group_booking_var = StringVar()
-    group_booking_checkbox = Checkbutton(checkbutton_frame,font='purple', text="Group Booking", variable=group_booking_var, onvalue="yes", offvalue="no")
+    group_booking_checkbox = Checkbutton(checkbutton_frame,font='purple', text="Group Booking", variable=group_booking_var, onvalue="yes", command=update_group_booking_var)
     start_time = datetime.strptime("6:00 AM", "%I:%M %p")
     end_time = datetime.strptime("11:00 PM", "%I:%M %p")
     time_slots = create_time_slots(start_time, end_time, 1) 
@@ -131,6 +144,7 @@ def book_slot(time_slot, booking_date, payable_amount, booking_amount, turf_name
     print("Booking successful. Turf ID:", turf_id)
     
 root = Tk()   
+group_booking_var = StringVar()
 global time_entry
 time_entry = Entry(root)
 time_entry.pack()
@@ -144,15 +158,108 @@ payable_entry.pack()
 
 entry_4 = Entry(root)
 entry_4.pack()
+current_user_id = None
+
+def get_current_user_id():
+    with sqlite3.connect("build\\user.db") as db:
+        cursor = db.cursor()
+        cursor.execute("SELECT MAX(id) FROM current_user")
+        result = cursor.fetchone()
+        if result is not None:
+            return result[0]
+        else:
+            print("No users found")
+            return None
+
+def get_wallet_balance(user_id):
+    with sqlite3.connect("build\\user.db") as db:
+        cursor = db.cursor()
+        cursor.execute("SELECT wallet FROM current_user WHERE id = ?", (user_id,))
+        result = cursor.fetchone()
+        if result is not None:
+            wallet_balance = result[0]
+            print(f"Wallet balance: {wallet_balance}")
+            return wallet_balance
+        else:
+            print("No user found with given ID")
+            return None
+
+
 def store_values():
+    
     if time_entry:
         time_slot = time_entry.get()
         booking_date = date_entry.get()
-        payable_amount = payable_entry.get()
-        booking_amount = entry_4.get()
-        if not time_slot or not booking_date or not payable_amount or not booking_amount:
-            messagebox.showerror("Error", "All boxes must be filled.")
+        
+        group_booking = group_booking_var.get() 
+        current_user_id = get_current_user_id()  #  user ID
+        wallet_balance = get_wallet_balance(current_user_id)  
+        print(f"Current user ID: {current_user_id}")  # Print the current user ID
+        wallet_balance = get_wallet_balance(current_user_id)  
+        print(group_booking_var.get())
+        print(f"Current wallet balance: {wallet_balance}")
+        
+        cursor.execute("SELECT name FROM current_user ORDER BY id DESC LIMIT 1")
+        name_row = cursor.fetchone()
+        if name_row is None:
+            messagebox.showerror("Error", "No name found in the current user table.")
             return
+        turf_name = name_row[0]
+        
+        try:
+            payable_amount = float(payable_entry.get())  
+            booking_amount = float(entry_4.get())  
+        except ValueError:
+            messagebox.showerror("Error", "Payable amount and booking amount must be numbers.")
+            return
+
+        if not time_slot:
+            messagebox.showerror("Error", "Time slot must be filled.")
+            return
+
+        if not booking_date:
+            messagebox.showerror("Error", "Booking date must be filled.")
+            return
+
+        if payable_amount is None:
+            messagebox.showerror("Error", "Payable amount must be filled.")
+            return
+
+        if booking_amount is None:
+            messagebox.showerror("Error", "Booking amount must be filled.")
+            return
+        
+        print(f'group_booking: {group_booking}, payable_amount: {payable_amount}, booking_amount: {booking_amount}')
+        # Assuming `window` is the instance of your window
+        if group_booking == "":
+            try:
+                if (payable_amount) != (booking_amount):
+                    messagebox.showerror("Error", "For group booking, payable amount should not be equal to booking amount.")
+                    return
+            except ValueError:
+                messagebox.showerror("Error", "Payable amount and booking amount must be numbers.")
+                return
+
+        print(f"Time slot: {time_slot}, Booking date: {booking_date}, Payable amount: {payable_amount}, Booking amount: {booking_amount}, Group booking: {group_booking}")  # New print statement
+
+        # Generate a random turf ID
+        turf_id = "TF" + str(random.randint(9999, 99990))
+        # Insert the booking details into the table
+        cursor.execute('''INSERT INTO bookings (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name) 
+                  VALUES (?, ?, ?, ?, ?, ?)''', (time_slot, booking_date, payable_amount, turf_id, booking_amount, turf_name))
+        conn.commit()
+        
+        print("Booking succe\
+            ssful. Turf ID:", turf_id)
+        messagebox.showinfo("Success", "Booking successful. Turf ID: " + str(turf_id))
+
+        # Destroy the window after successful booking
+        window.destroy()
+
+        print(f"Time slot: {time_slot}, Booking date: {booking_date}, Payable amount: {payable_amount}, Booking amount: {booking_amount}, Group booking: {group_booking}")  # New print statement
+
+        
+
         # Generate a random turf ID
         turf_id = "TF" + str(random.randint(9999, 99990))
         # Insert the booking details into the table
@@ -163,6 +270,7 @@ def store_values():
         messagebox.showinfo("Success", "Booking successful. Turf ID: " + str(turf_id))
     else:
         print("Time entry widget is not available.")
+        
 root.mainloop()
     
 OUTPUT_PATH = Path(__file__).parent
@@ -187,7 +295,7 @@ def open_booking():
     OUTPUT_PATH = Path(__file__).parent
     ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame2")
 
-
+    
     def relative_to_assets(path: str) -> Path:
         return ASSETS_PATH / Path(path)
 
@@ -221,7 +329,7 @@ def open_booking():
     payable_entry = Entry(
         window,
         bd=0,
-        bg="#008000",
+        bg="#FFC83D",
         fg="#000716",
         highlightthickness=0
     )
@@ -426,12 +534,20 @@ def open_booking():
         fill="#000000",
         font=("Poppins SemiBold", 12 * -1)
     )
+    canvas.create_text(
+        225.0,
+        236.0,
+        anchor="nw",
+        text="Booking Amt.",
+        fill="#000000",
+        font=("Poppins SemiBold", 12 * -1)
+    )
 
     window.resizable(False, False)
     window.update_idletasks()
     
     window.mainloop()
-   
+#@@@@@@@@@@@@@@@ 
 #____________________________##------------------#
 
 def open_grp_booking():

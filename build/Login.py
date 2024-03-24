@@ -1,10 +1,11 @@
 import sqlite3
 from pathlib import Path
 from subprocess import call
-
+from datetime import datetime
 
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage,messagebox
-
+conn=sqlite3.connect(r'build/user.db')
+cursor=conn.cursor()
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"G:\TurfBookingSyS\build\assets\frame0")
@@ -19,6 +20,8 @@ def open_home_page():
     call(["python","build\homepage.py"])
     window.geometry("+100+400")
     
+
+
 def validate_credentials():
     username_or_email = entry_1.get()
     password = entry_2.get()
@@ -32,10 +35,50 @@ def validate_credentials():
         messagebox.showerror("Error", "Invalid username/email or password")
         return False
     else:
+        # Insert the user's details into the current_user table
+        cursor.execute("INSERT INTO current_user (name, email, login_time) VALUES (?, ?, ?)", (user[1], user[2], datetime.now().isoformat()))
+        
+        # Update the 'wallet' column in the 'current_user' table with the corresponding values from the 'user' table
+        cursor.execute("""
+            UPDATE current_user 
+            SET wallet = (
+                SELECT wallet 
+                FROM user 
+                WHERE user.name = current_user.name
+            )
+        """)
+        
+        db.commit()
         return True
+  
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+# cursor.execute('DROP TABLE current_user')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS current_user (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        login_time TEXT NOT NULL,
+        wallet INTEGER,
+        FOREIGN KEY(name, email) REFERENCES user(name, email)
+    );
+''')
+# Add a new column 'wallet' to the 'current_user' table
+# cursor.execute("ALTER TABLE current_user ADD COLUMN wallet INTEGER")
+
+# Update the 'wallet' column in the 'current_user' table with the corresponding values from the 'user' table
+# cursor.execute("""
+#     UPDATE current_user 
+#     SET wallet = (
+#         SELECT wallet 
+#         FROM user 
+#         WHERE user.name = current_user.name
+#     )
+# """)
+
+conn.commit()
 
 
 window = Tk()
